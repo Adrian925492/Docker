@@ -42,6 +42,40 @@
                 "presentation": {
                     "showReuseMessage": false
                }
+            },
+            {
+                "type": "shell",
+                "label": "build_by_docker",
+                "command": "docker run -v D:/Dokumenty/Elektronika/Opracowania/Docker/ExampleDockerfile:/Source adrian9254/repo:v0.2 make all",
+                "args": [
+                ],
+                "problemMatcher": [
+                    "$gcc"
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "presentation": {
+                    "showReuseMessage": false
+               }
+            },
+            {
+                "type": "shell",
+                "label": "clean_by_docker",
+                "command": "docker run -v D:/Dokumenty/Elektronika/Opracowania/Docker/ExampleDockerfile:/Source adrian9254/repo:v0.2 make clean",
+                "args": [
+                ],
+                "problemMatcher": [
+                    "$gcc"
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "presentation": {
+                    "showReuseMessage": false
+               }
             }
     ]
 }
