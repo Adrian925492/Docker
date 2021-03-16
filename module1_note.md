@@ -59,7 +59,8 @@ b) Modify DOCKER_HOST variable (for one command or for whole session) to use pro
 
 2. Installing docker on Ubuntu:
 -> By apt repository (just add appropriate repo to the apt before)!
--> By usage automated script: *get.docker.com* which will install docker engine for us
+-> By usage automated script: *get.docker.com* which will install docker engine for us, example ```curl -fsSL get.docker.com | sh```
+-> Add user to docker group (as sudo) ```adduser <myusername> docker``` and reboot the host os
 
 ! See docker docs
 
