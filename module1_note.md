@@ -17,6 +17,10 @@
 
 **Docker desktop** - dedicated platform to run docker containers on Windows/MacOS
 
+**Docker daemon config file** - the fiel containes user defined config for docker daemon (for. ex. insecure-registries config). It is by default stored in */etc/docker/daemon.json* location. By defaultm it does not exsits (has to be created by user if needed). We can create it also in other location and pass the path to it by **--config-file** flag to **docker run** command. Some of configs can be reloaded when docker daemon is running, by sending SIGHUP signal on Linux. Aby to zrobić (w Linuxie) należy do procesu demona wyslac odpowiedni sygnał komendą ```kill -HUP $(pidof dockerd)```. PID procesu docker engina możemy uzyskać komendą ```pidof dockerd```.
+
+**Docker client config file** - simrarly to docker daemon, also docker client can be configured. To do that we have to just create **config.json** file with new config and pass it to docker client command by ```docker --config <path_to_configfile_directory> <command>```. Other possibility is to use **env DOCKER_CONFIG=<path_to_configfile>**. If we export such env, the docker clint will use the config any time. We can set it by command ```export DOCKER_CONFIG=<path_to_configdir>``` and unset it by command ```unset DOCKER_CONFIG```. We can also set it permanently by modyfing/adding **config.json** file to **~/.docker** path.
+
 > **_NOTE_** ! Popular programming languages has its eligeable images in docker hub naming same, as language. For example, to run python script we just need to type: 
 ```docker run -v `pwd`/script.py:/script.py python:3-alpine pytohn3 /script.py```
 The docker will pull official image with python 3 alpine version and run "script" on it.
@@ -24,6 +28,7 @@ The docker will pull official image with python 3 alpine version and run "script
 > **_NOTE_** ! All images with "alpine" suffix are n general lighter versions of standerd images.
 
 > **_TIP_** Elgeable documentation can be found on https://devdocs.io/. It is lightweight, and once enabled documentation is stored inside browser cache, so it will be accesible also without access to the internet. 
+> **_TIP_** - In **~/.profile** file we can add any commands that are executed at startup with the user. For example - we can add any docker config file here to make it only for selected user.
 ----------
 
 ## Docker commands
