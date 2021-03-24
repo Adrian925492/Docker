@@ -21,6 +21,12 @@
 
 **Docker client config file** - simrarly to docker daemon, also docker client can be configured. To do that we have to just create **config.json** file with new config and pass it to docker client command by ```docker --config <path_to_configfile_directory> <command>```. Other possibility is to use **env DOCKER_CONFIG=<path_to_configfile>**. If we export such env, the docker clint will use the config any time. We can set it by command ```export DOCKER_CONFIG=<path_to_configdir>``` and unset it by command ```unset DOCKER_CONFIG```. We can also set it permanently by modyfing/adding **config.json** file to **~/.docker** path.
 
+**Logs from docker** - logs from docker can be read and accesed via OS. It differs depending on os type. The full path of logs location in the OS are in lach.dev/docker-engine-logs more info can be found. In ubuntu, to see the logs, we have to run ```sudo tail -f /var/log/upstart/docker.log```.
+
+**Monitoring used resources** - we can look for used hard disk memory by docker daemon  by ```docker system df``` command. The ```-v``` flag added to the command lists the informations of used memory by image and container. In order to monitor in real time the resource usage by container, including CPU, RAM and network usage, we can use ```docker stats``` command. The ```--no-stream``` flag will run the stats just once, without real time feedback. Additionally we can add ```--format <format>``` parameter to format the output. All formats of docker stats command can be found in docker stats command documentation. In order to see detailed informations about docker image/container, we can use ```docker inspect <container/image>``` command. For example, command used on image will give us paths to caches filesystems of all layers being parts of the image.
+
+**Dangling images and dangling containers** - dangling images refers to images tahat are not taged and can be accesed only via its hash. Dangling image can occur if we rebuild some image and the old image would become a dangling. Same rule can be applied to containers, networks or volumes. To remove dangling objects we can use command ```docker <images / containers / volumes / networks > prune```. If we want to remove all dangling objects we can use command ```docker system prune```. In order to remove any specified non - dangling image, we can use ```docker rmi <image_name or hash>```, and to remove container - ```docker rm <container name of hash```. Adding ```-a``` flag to any prune command will efect removing all related to command docker objects, currently not running, not the dangling only. For example, if we have no container running at the moment, and we type ```docker system prune -a```, we will remove all contianers, images etc. The ```-f``` flag supress prune confirmation (usable in scripts).
+
 > **_NOTE_** ! Popular programming languages has its eligeable images in docker hub naming same, as language. For example, to run python script we just need to type: 
 ```docker run -v `pwd`/script.py:/script.py python:3-alpine pytohn3 /script.py```
 The docker will pull official image with python 3 alpine version and run "script" on it.
@@ -28,7 +34,9 @@ The docker will pull official image with python 3 alpine version and run "script
 > **_NOTE_** ! All images with "alpine" suffix are n general lighter versions of standerd images.
 
 > **_TIP_** Elgeable documentation can be found on https://devdocs.io/. It is lightweight, and once enabled documentation is stored inside browser cache, so it will be accesible also without access to the internet. 
+
 > **_TIP_** - In **~/.profile** file we can add any commands that are executed at startup with the user. For example - we can add any docker config file here to make it only for selected user.
+> **_NOTE_** - In ```/var/lib/docker``` directory we have location of docker cache. Here we can find all infor about networks, containers, images etc.
 ----------
 
 ## Docker commands
