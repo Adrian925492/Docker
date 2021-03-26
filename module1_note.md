@@ -32,6 +32,18 @@
 > Using debug mode - add env variable ``` ``` to ```/etc/docker/daemon.json``` and reload the config by sending **SIGHUP** signal to reload the daemon and apply the change. You can also kill the engine by **SIGKILL** and restore it again.
 > Getting the stacktrace - we can get the stacktrace by sending *SIGUSR1* signal to docker daemon by command ```kill -USR1 $(pidof dockerd)```. In the docker logs we can observe where the stacktrace has been written (usually in /var/run/docker/goroutine-stacks-xxxxx.log)
 
+**Container states**:
+CREATED -> RUNNING -> PAUSED / STOPPED
+
+* CREATED - the contianer is created and ready to be run
+* RUNNING - the container is running
+* PAUSED - contianer is paused. Resources are still occupied, but not used.
+* STOPPED - container stopped doing his job. Resources are freed.
+
+! After ```docker run``` command the container goes thred states: CREATED and to RUNNING.
+
+**Container attributes** - all runned container has its unique, automatically generated **id**, and a name, which can be given by *--name=* parameter added to *docker run* command, or if not given, will be automatically given. The id and nae is used for identyfing the container in any other command.
+
 > **_NOTE_** ! Popular programming languages has its eligeable images in docker hub naming same, as language. For example, to run python script we just need to type: 
 ```docker run -v `pwd`/script.py:/script.py python:3-alpine pytohn3 /script.py```
 The docker will pull official image with python 3 alpine version and run "script" on it.
@@ -46,9 +58,12 @@ The docker will pull official image with python 3 alpine version and run "script
 
 ## Docker commands
 
-* **docker run [options] <image> [command]** - runc container based in image and executes command on it
+* **docker run [options] <image> [command]** - runc container based in image and executes command on it. When we type the command, client sends request do daemon. Than, daemon tries to fnd the image locally, if not found looks for it in logged registries and downloads if found. Then, the daemon starts the container based on image and informs client about it. The docker run can end with error (typical error codes: 125 - daemon error; 126: command cannot be invoked; 127: command not found; else exit code of the container).
 * **docker version** - informs if we have and what kind of docker client and docker engine ou our setup
 * **docker info** - gives more informations about docker engine, includeing nr f images, stopped containers, assigned registries, plugins etc.
+* **docker pull <image>** - pulls image from registry. If the image is already in daemon cache, the image will be checked if there is any update in registry, and update, if exists, will be pulled. When docker runs image, it will use local copy as first. It is not recomended to use same tags for updates of docker images (old tags shall not be overwritten). If we du not type explicitly the version, *latest* version will be used.
+* **docker rename <id or old name> <new name>** - Renames the container
+
 
 ## Docker environmental variables
 * **DOCKER_HOST** - specifies url of socket for docker engine. By changing it, we can reorder connection between docker  client and docker engine.
