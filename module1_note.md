@@ -44,6 +44,10 @@ CREATED -> RUNNING -> PAUSED / STOPPED
 
 **Container attributes** - all runned container has its unique, automatically generated **id**, and a name, which can be given by *--name=* parameter added to *docker run* command, or if not given, will be automatically given. The id and nae is used for identyfing the container in any other command.
 
+**Container namespaces** - all of the containers has its own, unique set of namespaces, like PID (user ID namespace); User namespace; UTS; Mount - disk namespace; Newtork namespace nad IPC - inter process communication namespace. It means, that each container can use resources only from its own namespace. Namespaces can be shared between containers.
+
+**IPC communication between containers** - to make able 2 containers to connect each other using IPC mechanism, we have to run one of them with flag ```--ipc shareable``` which will make its ipc communication space shareable, and run other container, which we want to use ipc of the first one with flag ```--ipc container:<name of cont. with shareable ipc>```.
+
 > **_NOTE_** ! Popular programming languages has its eligeable images in docker hub naming same, as language. For example, to run python script we just need to type: 
 ```docker run -v `pwd`/script.py:/script.py python:3-alpine pytohn3 /script.py```
 The docker will pull official image with python 3 alpine version and run "script" on it.
@@ -54,6 +58,7 @@ The docker will pull official image with python 3 alpine version and run "script
 
 > **_TIP_** - In **~/.profile** file we can add any commands that are executed at startup with the user. For example - we can add any docker config file here to make it only for selected user.
 > **_NOTE_** - In ```/var/lib/docker``` directory we have location of docker cache. Here we can find all infor about networks, containers, images etc.
+> **_TIP_** - If we have some "commnad not found" error, we can use https://command-not-found.com/ to find out commands we have to use to get the program we want.
 ----------
 
 ## Docker commands
@@ -98,5 +103,17 @@ b) Modify DOCKER_HOST variable (for one command or for whole session) to use pro
 ! See docker docs
 
 3. Installing docker on Windows
+
+## Linux definitions
+
+**Unix Socket** - A special kind of file (type "s") which is used for inter process communication. We have 3 tyles of unix sockets: SOCK_STREAM (comparable to TCP); SOCK_DGRAM (comparable to UDP) and SOCK_SEQPACKET (comparable to SCTP). Unix socket is a communication endpoint for processes. Only 2 processes can communcate threw single unix socket, and the communication is similar to internet communication.
+
+**IPC** - Inter process communication - set of Unix/Linux mechanisms for communication processes each other. In general, it defines mechanisms used by many processes to share data. Types of IPC communication in Unix/Linux:
+> File - The simplest one. Each process can write and read to/from file at any time. A record is stored on a hard drive.
+> Signal - a system message sent from one process to another (for. ex. SIGKILL, SUGUSR1 etc...).
+> Socket - Data are sent over a network interface, to processes working on the same host machine, or on different machines, using choosen internet protocol (ex. TCP). Special type of socket is unix-socket, which allows only to send data between processes on the same host machine, and all communication is handhelded by the kernel. Many processes can communicate to single socket.
+> Message queue - special type of a file, that allows to communicate just 2 processes. The processes are directly connected each other.
+> Pipe - unidirectional data channel using standard io. 2 processes can be connected by single pipe, from which one can only sent to the pie, and other can receive. Data in a pipe are buffered untill receiving process takes it. To make bidirectional communication between 2 processes - we need 2 pipes.
+> Shared memory segment - Defined range of a memory that is shaed between processes.
 
 
