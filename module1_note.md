@@ -116,11 +116,12 @@ b) Modify DOCKER_HOST variable (for one command or for whole session) to use pro
 **Unix Socket** - A special kind of file (type "s") which is used for inter process communication. We have 3 tyles of unix sockets: SOCK_STREAM (comparable to TCP); SOCK_DGRAM (comparable to UDP) and SOCK_SEQPACKET (comparable to SCTP). Unix socket is a communication endpoint for processes. Only 2 processes can communcate threw single unix socket, and the communication is similar to internet communication.
 
 **IPC** - Inter process communication - set of Unix/Linux mechanisms for communication processes each other. In general, it defines mechanisms used by many processes to share data. Types of IPC communication in Unix/Linux:
-> File - The simplest one. Each process can write and read to/from file at any time. A record is stored on a hard drive.
-> Signal - a system message sent from one process to another (for. ex. SIGKILL, SUGUSR1 etc...).
-> Socket - Data are sent over a network interface, to processes working on the same host machine, or on different machines, using choosen internet protocol (ex. TCP). Special type of socket is unix-socket, which allows only to send data between processes on the same host machine, and all communication is handhelded by the kernel. Many processes can communicate to single socket.
-> Message queue - special type of a file, that allows to communicate just 2 processes. The processes are directly connected each other.
-> Pipe - unidirectional data channel using standard io. 2 processes can be connected by single pipe, from which one can only sent to the pie, and other can receive. Data in a pipe are buffered untill receiving process takes it. To make bidirectional communication between 2 processes - we need 2 pipes.
-> Shared memory segment - Defined range of a memory that is shaed between processes.
+
+* **File** - The simplest one. Each process can write and read to/from file at any time. A record is stored on a hard drive.
+* **Signal** - a system message sent from one process to another (for. ex. SIGKILL, SUGUSR1 etc...).
+* **Socket** - Data are sent over a network interface, to processes working on the same host machine, or on different machines, using choosen internet protocol (ex. TCP). Special type of socket is unix-socket, which allows only to send data between processes on the same host machine, and all communication is handhelded by the kernel. Many processes can communicate to single socket.
+* **Message queue** - special type of a file, that allows to communicate just 2 processes. The processes are directly connected each other.
+* **Pipe** - unidirectional data channel using standard io. 2 processes can be connected by single pipe, from which one can only sent to the pie, and other can receive. Data in a pipe are buffered untill receiving process takes it. To make bidirectional communication between 2 processes - we need 2 pipes.
+* **Shared memory segment** - Defined range of a memory that is shaed between processes.
 
 
