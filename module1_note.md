@@ -50,6 +50,8 @@ CREATED -> RUNNING -> PAUSED / STOPPED
 
 **IPC communication between containers** - to make able 2 containers to connect each other using IPC mechanism, we have to run one of them with flag ```--ipc shareable``` which will make its ipc communication space shareable, and run other container, which we want to use ipc of the first one with flag ```--ipc container:<name of cont. with shareable ipc>```.
 
+**Daemon mode** - container can be run in attached and in daemon mode. In attached mode, the container *STDOUT* and *STDERR* streams are attached to terminal. In daemon mode, the streams are not attached and the contaienr works in background. We can see the streams by displaying container logs.
+
 > **_NOTE_** ! Popular programming languages has its eligeable images in docker hub naming same, as language. For example, to run python script we just need to type: 
 ```docker run -v `pwd`/script.py:/script.py python:3-alpine pytohn3 /script.py```
 The docker will pull official image with python 3 alpine version and run "script" on it.
