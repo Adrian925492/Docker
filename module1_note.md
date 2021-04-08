@@ -78,6 +78,9 @@ The docker will pull official image with python 3 alpine version and run "script
 * **docker stats** will block terminal and in real time give information about containers and consubed resources by it. The *--no-stream* parameter will print just a current stats without real-time mode, and *--format {{}}* allows to format the output. 
 * **docker top <container name or id>** will give us list of processes (top command) for the given container. The PID and PPID are ids from host OS perspective. 
 * **docker diff <container name>** will give us diff of filesystem of the container since it was run.
+* **docker attach <container name>** will attach STDIO and STDERR streams of a given container to current terminal. We can add parameter *--detach-keys <some keyn, ex. ctrl-a>* to define detach keys combination. It can be also put inside configfiled of the docker daemon (detach-keys record).
+* **[CTRL + P + Q]** will detach currently attached container
+* **docker restart** will restart the container, launch run command, but will not remove and recreate container. The command will restart already created container, so all fs diffs will be kept.
 
 ## Docker environmental variables
 * **DOCKER_HOST** - specifies url of socket for docker engine. By changing it, we can reorder connection between docker  client and docker engine.
@@ -113,6 +116,33 @@ b) Modify DOCKER_HOST variable (for one command or for whole session) to use pro
 
 3. Installing docker on Windows
 
+4. Running processes inside container with PID1
+  It is possible to run any application under PID1 in container PID namespace. To do that, just run the application with container by passing it as parameter or by typing it to *RUN* command in dockerfile. It is a good practice to handle at least *SIGKILL* signal, and better also *SIGTERM* by the process runed with PID1. If signals are not handheld, sending it to process will do nothing, beacoude PID1 process is able to ignore non handled signals.
+  
+  If the PID1 application is shell script, You can use syntax:
+  ```
+  #!/bin/bash
+  trap '' EXIT
+  while true; do
+    ... <content>
+  done
+  ```
+  The "trap" will catch EXIT which means it will register SIGKILL and SIGTERM signal. The trap will cause ending the process.
+  ! If there is not given explicitly init process, there is ready init process default given by docker, named **tini**. To run that porcess under docker just add *--init* flag to **docker run** command. The *tini* will handle signals, handle zombie processes and manage PID fro sub processes inside the container.
+  
+  **_TIP_** If You wont to run any new app inside schell runned with PID1, and we want to run some other application inside it also with PID1, we have to run it with **exec** command prefix, like
+  ```
+  exec /usr/bin/someApp -daemon
+  ```
+  That will cause taking control of the current process with PID1 by someApp.
+  
+  **_TIP_** If Youw ant to run some command inside script with other user (group), You can use **su-exec** or **gosu** prefix, like:
+  ```
+  su-exec user:[optional group] comeCommand
+  gosu user:[optional group] command
+  ```
+  By using that we can, for example, run some commands for other user as root.
+
 ## Linux definitions
 
 **Unix Socket** - A special kind of file (type "s") which is used for inter process communication. We have 3 tyles of unix sockets: SOCK_STREAM (comparable to TCP); SOCK_DGRAM (comparable to UDP) and SOCK_SEQPACKET (comparable to SCTP). Unix socket is a communication endpoint for processes. Only 2 processes can communcate threw single unix socket, and the communication is similar to internet communication.
@@ -125,5 +155,9 @@ b) Modify DOCKER_HOST variable (for one command or for whole session) to use pro
 * **Message queue** - special type of a file, that allows to communicate just 2 processes. The processes are directly connected each other.
 * **Pipe** - unidirectional data channel using standard io. 2 processes can be connected by single pipe, from which one can only sent to the pie, and other can receive. Data in a pipe are buffered untill receiving process takes it. To make bidirectional communication between 2 processes - we need 2 pipes.
 * **Shared memory segment** - Defined range of a memory that is shaed between processes.
+
+**PID** - Process ID is an unique number identifying process on Linux system. The first runned process after running the OS gets PIS equals to 1. Any child process of the main process has higher PID value. Simirarly, inside docker container, the main process has PID eq. to one, but the processes from container in context of host os has naturarly higher pid values. The PID of the process can be used for identification of processes in commands like kill. The main process on ubuntu is named *systemd* (system daemon). Additionally, each container gets its own process namespace. Thanks to that we get separation of container processes of res of processes running on host os. Process with PID 1 has several special features. It does not handles non serviced signals (in other PID processes non sending non handled signal ends same as sending SIGKILL). Other responsibility of the PID1 process is clearing Zombie processes.
+
+**Zombie process** - Zobie process is a process that has been finished its job, but has not been waited for by its parent process. In that case, the process is in fact not executing, but it is not terminated and its pid still exists in pid table. The danger of that is that too many zombie process can fill all PIDs and destabilize OS. 
 
 
