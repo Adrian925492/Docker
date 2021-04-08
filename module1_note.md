@@ -44,6 +44,8 @@ CREATED -> RUNNING -> PAUSED / STOPPED
 
 **Container attributes** - all runned container has its unique, automatically generated **id**, and a name, which can be given by *--name=* parameter added to *docker run* command, or if not given, will be automatically given. The id and nae is used for identyfing the container in any other command.
 
+**Container size** - the size of contaienr is understood as all modifications added to image file syatem after running it. In general, it is size of top level, read - write layer.
+
 **Container namespaces** - all of the containers has its own, unique set of namespaces, like PID (user ID namespace); User namespace; UTS; Mount - disk namespace; Newtork namespace nad IPC - inter process communication namespace. It means, that each container can use resources only from its own namespace. Namespaces can be shared between containers.
 
 **IPC communication between containers** - to make able 2 containers to connect each other using IPC mechanism, we have to run one of them with flag ```--ipc shareable``` which will make its ipc communication space shareable, and run other container, which we want to use ipc of the first one with flag ```--ipc container:<name of cont. with shareable ipc>```.
@@ -68,7 +70,12 @@ The docker will pull official image with python 3 alpine version and run "script
 * **docker info** - gives more informations about docker engine, includeing nr f images, stopped containers, assigned registries, plugins etc.
 * **docker pull <image>** - pulls image from registry. If the image is already in daemon cache, the image will be checked if there is any update in registry, and update, if exists, will be pulled. When docker runs image, it will use local copy as first. It is not recomended to use same tags for updates of docker images (old tags shall not be overwritten). If we du not type explicitly the version, *latest* version will be used.
 * **docker rename <id or old name> <new name>** - Renames the container
-
+* **docker ps** - lists all active containers with its data (name, image, comand, status, run time (from), ports). The table is always sorted by time. If run with *-a* parameter (all), the command will list all containers, including containers in other than run state. Running it with *-l* parameter will list only recent run container (or none if no container is running). Parameter *-q* (quiet) will force the command to return only ids of the containers. It can be used for example inside subshell in other docker commands that needs ids of the container (ex. docker stop). For example, command *docker kill $(docker ps -q --filter name=web\*)* will kill all containers that has "web" in its name. Docker ps with *-s* parameter will give info about container size.
+* **docker logs <container id or name>** - will display all logs from the beggining of detached container (all stuffs from stdout/stderr). The *--tail N* parameter will force displaying only N last logs. Follow parameter *-f* will display the logs in real time mode.The *--since X* and *--until X* will dispaly logs from last X or untill X time. The --timestamp will add timestamp to every log line, and --details will priint additional informations to the logs. We can get infor what kind of driver is used for logging by *docker inspect --format '{{.HostConfig.LogConfig.Type}}' <container name>*, and get the log path (if the driver logs to file) by *docker inspect --format='{{.LogPath}}' <container name>*.
+* **docker inspect <container id or name>** will return all inforamtions that daemon knows about the container in json format. The *--format '{{ json <field>}}'* parameter will print out selected arg of the json.
+* **docker stats** will block terminal and in real time give information about containers and consubed resources by it. The *--no-stream* parameter will print just a current stats without real-time mode, and *--format {{}}* allows to format the output. 
+* **docker top <container name or id>** will give us list of processes (top command) for the given container. The PID and PPID are ids from host OS perspective. 
+* **docker diff <container name>** will give us diff of filesystem of the container since it was run.
 
 ## Docker environmental variables
 * **DOCKER_HOST** - specifies url of socket for docker engine. By changing it, we can reorder connection between docker  client and docker engine.
