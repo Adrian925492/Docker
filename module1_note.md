@@ -81,6 +81,7 @@ The docker will pull official image with python 3 alpine version and run "script
 * **docker attach <container name>** will attach STDIO and STDERR streams of a given container to current terminal. We can add parameter *--detach-keys <some keyn, ex. ctrl-a>* to define detach keys combination. It can be also put inside configfiled of the docker daemon (detach-keys record).
 * **[CTRL + P + Q]** will detach currently attached container
 * **docker restart** will restart the container, launch run command, but will not remove and recreate container. The command will restart already created container, so all fs diffs will be kept.
+* **docker exec <id or name> <command>** - Will execute command inside given docker image. The *-it* flag will make it in interactive mode. The *-u 0* parameter will do the command by root user (UID of the root user is 0).
 
 ## Docker environmental variables
 * **DOCKER_HOST** - specifies url of socket for docker engine. By changing it, we can reorder connection between docker  client and docker engine.
@@ -142,6 +143,9 @@ b) Modify DOCKER_HOST variable (for one command or for whole session) to use pro
   gosu user:[optional group] command
   ```
   By using that we can, for example, run some commands for other user as root.
+  
+  **_TIP_** We can enter the container namespace by using **nsenter** command. The command works only as sudo user, and allows to get into given namespace. Example:
+  ``` sudo nsenter -t $(docker inspect -f '{{ .State.Pid }}' <container_name>) -m ps aux```. Th docker inspect subshell will return us PID of any process inside the container (1st from list). To enter the namespace of the container we need any proces from the container. The *-m* parameter will make that command will be from inside the container, and not giving the parameter will make it from outside the container (from host os). Other tool of 
 
 ## Linux definitions
 
@@ -160,4 +164,5 @@ b) Modify DOCKER_HOST variable (for one command or for whole session) to use pro
 
 **Zombie process** - Zobie process is a process that has been finished its job, but has not been waited for by its parent process. In that case, the process is in fact not executing, but it is not terminated and its pid still exists in pid table. The danger of that is that too many zombie process can fill all PIDs and destabilize OS. 
 
+**Process informations** - in /proc we have all informations about processes organized in catalogue structure. We can get from there for ex. informations about used resources, etc. The processes inside here are organized in folder structure, by ID, for example root process will be available under */proc/1* directory. We can also see how the user can see filesystem by */proc/1/root*. This will give us info about how the root user sees the fs. We can use it forex. to see files from container fs from host os just by going into: */proc/<PID of any process inside container>/root*. This will give us view of the fs inside container as root user of the container would see it. 
 
