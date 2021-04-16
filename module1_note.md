@@ -92,6 +92,12 @@ The docker will pull official image with python 3 alpine version and run "script
 ```free -h``` - give info about system memory (hard drive)
 ```cat /proc/cpuinfo``` - gives info about cpu on the system
 
+## Docker images versioning
+
+**Stable tagging** - The version of the image cames by components: **<major_version>.<minor_version>**. If we tag any image with some version, for ex. 1.2, the docker will automatically assign **:2** tak pointed to highest minor version of images tagged by major version 2, and the **:latest** tag which points to the latest released image, regardles its major and monor vesrion. In stable tagging we use major and minor versions. Stable tags can be forex. used for tagging images that will be used as jenkins agents.
+
+**Unique tagging** - in unique tagging we tag versions by syntax **<version>**, without usage minor/major versioning. There will only be created **:latest** automatic tag pointed to image commited last in time.
+
 ## Valuable programs
 
 ### From apt-get
