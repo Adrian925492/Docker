@@ -99,6 +99,18 @@ The docker will pull official image with python 3 alpine version and run "script
 
 **Unique tagging** - in unique tagging we tag versions by syntax **<version>**, without usage minor/major versioning. There will only be created **:latest** automatic tag pointed to image commited last in time.
 
+**Multistage builds** - Means we can use multiple times FROM instruction in Dockerfile. Moreover, all stages of build can use stuffs defined in previous stages (like ENV variables). Multistage builds alows us to create lighter versions of final image - only the image started from last FROM instruction will be the final one. To use multistage build we can use **COPY --from=<stage> <source> <dest>** command. The command allows to copy some files (source) to destination inside our build image, taken from given stage. The stage can be identified by its id (from 0), or by stage name (after *AS* directive in stage). The **--from** and accept also other docker image name and copy some files from inside it. The dockerfile like:
+  ```
+  FROM ubuntu:16 AS base_os
+  RUN "echo someHost >> /etc/hosts"
+  
+  FROM someOtherImage
+  COPY --from=base_os /etc/hosts /myHosts
+ ```
+Will create the image which has copied ONLY hosts from base image (Ubuntu). The final base image for created image will be someOtherImage.
+
+! If we do not want to use any base image we type **scratch** to FROM command (FROM scratch). Then, our docker image will base on no image.
+  
 ## Valuable programs
 
 ### From apt-get
@@ -155,6 +167,8 @@ b) Modify DOCKER_HOST variable (for one command or for whole session) to use pro
   ``` sudo nsenter -t $(docker inspect -f '{{ .State.Pid }}' <container_name>) -m ps aux```. Th docker inspect subshell will return us PID of any process inside the container (1st from list). To enter the namespace of the container we need any proces from the container. The *-m* parameter will make that command will be from inside the container, and not giving the parameter will make it from outside the container (from host os).
   
   **_TIP_** Docker ENTRYPOINT vs CMD command. If in the dockerfile we have both ENTRYPOINT and CMD command, the things given in ENTRYPOINT will be executed, and the things given in CMD will act as a parameters for ENTRYPOINT command. In case if we add some parameters to docker run, the CMD will not be used wn given by hand parameters will be passed to ENTRYPOINT command. If we do not have ENTRYPOINT, and have CMD, and we just run the image without any prams, the CMD will be treated as command and executed. If we have some CMD command and anyway pass some parameters to docker run, than the given parameters will be treated as command to run (1st param) and parametrs to the command. CMD will not be used in that case. We can use ENTRYPOINT and CMD to rpoduce docker that will act as kind of executable file. The WORKDIR instruction defines work directory for RUN, COPY, ADD, ENTRYPOINT and CMD commands. If we give no */* at the begining of workdir (non absolute path), the workdir will create directory relative to current workdir.
+  
+**_TIP_** .dockerignore - the file that allows us to specify ignored parts of build context directory (syntax as for .gitignore file). With dockerignore file we can set COPY . . in a dockerfile to copy all build context inside dockef image, and in the .dockerignore file we can skip selected files. 
 
 ## Linux definitions
 
