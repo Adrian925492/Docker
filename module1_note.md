@@ -82,6 +82,7 @@ The docker will pull official image with python 3 alpine version and run "script
 * **[CTRL + P + Q]** will detach currently attached container
 * **docker restart** will restart the container, launch run command, but will not remove and recreate container. The command will restart already created container, so all fs diffs will be kept.
 * **docker exec <id or name> <command>** - Will execute command inside given docker image. The *-it* flag will make it in interactive mode. The *-u 0* parameter will do the command by root user (UID of the root user is 0).
+* **docker build <build context>** will build image basing on its dockerfile. The dockerfile has to exists inside build context (build context is a path). If we do not use any COPY or ADD command, we do not need any directory as build context, we can injest the Dockerfile to the docker build directly. In such situation the command would look like **docker build - < Dockerfile**. The **-** means we use nothing as build context, and the **<** means we inject directly the given dockerfile.
 
 ## Docker environmental variables
 * **DOCKER_HOST** - specifies url of socket for docker engine. By changing it, we can reorder connection between docker  client and docker engine.
@@ -151,7 +152,9 @@ b) Modify DOCKER_HOST variable (for one command or for whole session) to use pro
   By using that we can, for example, run some commands for other user as root.
   
   **_TIP_** We can enter the container namespace by using **nsenter** command. The command works only as sudo user, and allows to get into given namespace. Example:
-  ``` sudo nsenter -t $(docker inspect -f '{{ .State.Pid }}' <container_name>) -m ps aux```. Th docker inspect subshell will return us PID of any process inside the container (1st from list). To enter the namespace of the container we need any proces from the container. The *-m* parameter will make that command will be from inside the container, and not giving the parameter will make it from outside the container (from host os). Other tool of 
+  ``` sudo nsenter -t $(docker inspect -f '{{ .State.Pid }}' <container_name>) -m ps aux```. Th docker inspect subshell will return us PID of any process inside the container (1st from list). To enter the namespace of the container we need any proces from the container. The *-m* parameter will make that command will be from inside the container, and not giving the parameter will make it from outside the container (from host os).
+  
+  **_TIP_** Docker ENTRYPOINT vs CMD command. If in the dockerfile we have both ENTRYPOINT and CMD command, the things given in ENTRYPOINT will be executed, and the things given in CMD will act as a parameters for ENTRYPOINT command. In case if we add some parameters to docker run, the CMD will not be used wn given by hand parameters will be passed to ENTRYPOINT command. If we do not have ENTRYPOINT, and have CMD, and we just run the image without any prams, the CMD will be treated as command and executed. If we have some CMD command and anyway pass some parameters to docker run, than the given parameters will be treated as command to run (1st param) and parametrs to the command. CMD will not be used in that case. We can use ENTRYPOINT and CMD to rpoduce docker that will act as kind of executable file. The WORKDIR instruction defines work directory for RUN, COPY, ADD, ENTRYPOINT and CMD commands. If we give no */* at the begining of workdir (non absolute path), the workdir will create directory relative to current workdir.
 
 ## Linux definitions
 
