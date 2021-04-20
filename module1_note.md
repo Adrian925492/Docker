@@ -50,6 +50,36 @@ CREATED -> RUNNING -> PAUSED / STOPPED
 
 **IPC communication between containers** - to make able 2 containers to connect each other using IPC mechanism, we have to run one of them with flag ```--ipc shareable``` which will make its ipc communication space shareable, and run other container, which we want to use ipc of the first one with flag ```--ipc container:<name of cont. with shareable ipc>```.
 
+**Docker volumes** - mechanism of usage some filesystem of hosts os inside docker container. In most basic way we can create any volume inside a container by VOLUME command inside dockerfile, or by -v <volume_name> inside docker run. Then, the volume will be created in a given path inside docker, and in random location inside volumes on host os. To get exact location of the volume on host os, type **dockr inspect -f '{{.Config.Volumes}}' volumeName**. Other way is to create volume by **docker volume volumeName** command and use the created volume in docker run by **-v namedVolume:pathToVolumeInsideDocker** added to **docker run**. The volume will be stored in volumes on host os. Third way is to just map existing path as a volume to the container by **-v host_dir_path:volume_path_in_docker** added to **docker run** command.
+
+**Docker networks** - docker provides several types of network drivers: host (only Linux host OS), bridge, none, swarm, container_network_mode (same as set in the given container). The drivers defines how and what we can use regarding network connections of the container.
+
+**Docker compose** - the tool for creating single docker image by multiple docker images using .yaml configuration. Docker compose has its distro to all systems that docker can work on (Linux, Mac, Windows). Docker compose allows to store whole application stack in a single YAML file. Docker compose is a kind of wrapper for docker commands, and can be used with docker client in parallell. Docker compose is installed by default on Windows and Mac distributions, for Linux we have to install it (follow instruction on https://docs.docker.com/compose/install/). 
+
+Docker compose version has to be at least as high as docker version. Docker compose is backward compatible, so the docker can be in lower version than compose tool.
+
+Docker compose YAML file sections:
+- version - required, specifies required docker-compose version
+- services - required, a service is one or more replicas of the same container
+- networks - optional, defines the networks that containers should use, by-default it is bridge
+- volumes - optional, defines volumes to be used by the containers
+
+And each service in the YAML has to be defined by:
+- iamge indicates the image
+- build points to path with Dockerfile, and optionaly parameters for the build
+
+
+
+
+Basic commands for docker compose and its analogy to docker client commands:
+- docker ps -> docker-compose ps
+- docker pull -> docker-compose pull
+- docker run -> docker-compose run
+- docker run -d -> docker-compose up -d
+- docker stop -> docker-compose stop
+- docker rm -> docker-compose rm
+- docker build -> docker-compose build
+
 **Daemon mode** - container can be run in attached and in daemon mode. In attached mode, the container *STDOUT* and *STDERR* streams are attached to terminal. In daemon mode, the streams are not attached and the contaienr works in background. We can see the streams by displaying container logs.
 
 > **_NOTE_** ! Popular programming languages has its eligeable images in docker hub naming same, as language. For example, to run python script we just need to type: 
@@ -67,7 +97,7 @@ The docker will pull official image with python 3 alpine version and run "script
 
 ## Docker commands
 
-* **docker run [options] <image> [command]** - runc container based in image and executes command on it. When we type the command, client sends request do daemon. Than, daemon tries to fnd the image locally, if not found looks for it in logged registries and downloads if found. Then, the daemon starts the container based on image and informs client about it. The docker run can end with error (typical error codes: 125 - daemon error; 126: command cannot be invoked; 127: command not found; else exit code of the container).
+* **docker run [options] <image> [command]** - runc container based in image and executes command on it. When we type the command, client sends request do daemon. Than, daemon tries to fnd the image locally, if not found looks for it in logged registries and downloads if found. Then, the daemon starts the container based on image and informs client about it. The docker run can end with error (typical error codes: 125 - daemon error; 126: command cannot be invoked; 127: command not found; else exit code of the container). 
 * **docker version** - informs if we have and what kind of docker client and docker engine ou our setup
 * **docker info** - gives more informations about docker engine, includeing nr f images, stopped containers, assigned registries, plugins etc.
 * **docker pull <image>** - pulls image from registry. If the image is already in daemon cache, the image will be checked if there is any update in registry, and update, if exists, will be pulled. When docker runs image, it will use local copy as first. It is not recomended to use same tags for updates of docker images (old tags shall not be overwritten). If we du not type explicitly the version, *latest* version will be used.
@@ -82,10 +112,11 @@ The docker will pull official image with python 3 alpine version and run "script
 * **[CTRL + P + Q]** will detach currently attached container
 * **docker restart** will restart the container, launch run command, but will not remove and recreate container. The command will restart already created container, so all fs diffs will be kept.
 * **docker exec <id or name> <command>** - Will execute command inside given docker image. The *-it* flag will make it in interactive mode. The *-u 0* parameter will do the command by root user (UID of the root user is 0).
-* **docker build <build context>** will build image basing on its dockerfile. The dockerfile has to exists inside build context (build context is a path). If we do not use any COPY or ADD command, we do not need any directory as build context, we can injest the Dockerfile to the docker build directly. In such situation the command would look like **docker build - < Dockerfile**. The **-** means we use nothing as build context, and the **<** means we inject directly the given dockerfile.
+* **docker build <build context>** will build image basing on its dockerfile. The dockerfile has to exists inside build context (build context is a path). If we do not use any COPY or ADD command, we do not need any directory as build context, we can injest the Dockerfile to the docker build directly. In such situation the command would look like **docker build - < Dockerfile**. The **-** means we use nothing as build context, and the **<** means we inject directly the given dockerfile. If we have experimental features enabled, we can use *--squash* flag. The docker, after building all layrs will squash them to only one, big layer, and the final image will have just that single layer.
+* **docker network connect [container_name] [network_name]** - allows to connect the given docker container to the given network name in runtime. 
 
 ## Docker environmental variables
-* **DOCKER_HOST** - specifies url of socket for docker engine. By changing it, we can reorder connection between docker  client and docker engine.
+* **DOCKER_HOST** - specifies url of socket for docker engine. By changing it, we can reorder connection between docker client and docker engine.
 
 ## Commands fo getting info about the running OS
 
@@ -112,6 +143,10 @@ Will create the image which has copied ONLY hosts from base image (Ubuntu). The 
 ! If we do not want to use any base image we type **scratch** to FROM command (FROM scratch). Then, our docker image will base on no image.
   
 ## Valuable programs
+
+### For docker
+
+**hadolint** - Linter for dockerfiles. Will give us informations about whant we can imporve in dockerfile, and moreover, can give us info about optimization of schell commands given in RUN directives. The hadolint is contenerized application. To get it we have to get appropriate docker image by ```docker pull hadolint/hadolint```, and to use it we type ```docker run -i hadolint/hadolint < our_dockerfile```.
 
 ### From apt-get
 
@@ -169,6 +204,13 @@ b) Modify DOCKER_HOST variable (for one command or for whole session) to use pro
   **_TIP_** Docker ENTRYPOINT vs CMD command. If in the dockerfile we have both ENTRYPOINT and CMD command, the things given in ENTRYPOINT will be executed, and the things given in CMD will act as a parameters for ENTRYPOINT command. In case if we add some parameters to docker run, the CMD will not be used wn given by hand parameters will be passed to ENTRYPOINT command. If we do not have ENTRYPOINT, and have CMD, and we just run the image without any prams, the CMD will be treated as command and executed. If we have some CMD command and anyway pass some parameters to docker run, than the given parameters will be treated as command to run (1st param) and parametrs to the command. CMD will not be used in that case. We can use ENTRYPOINT and CMD to rpoduce docker that will act as kind of executable file. The WORKDIR instruction defines work directory for RUN, COPY, ADD, ENTRYPOINT and CMD commands. If we give no */* at the begining of workdir (non absolute path), the workdir will create directory relative to current workdir.
   
 **_TIP_** .dockerignore - the file that allows us to specify ignored parts of build context directory (syntax as for .gitignore file). With dockerignore file we can set COPY . . in a dockerfile to copy all build context inside dockef image, and in the .dockerignore file we can skip selected files. 
+
+**_TIP_** Good practices for building images 
+1. Use --squash option for build base images. Do not use it for deployement images.
+2. Use as least as possible RUN comands. Each RUN command produces bew layer.
+3. Clean unnecessary files (by rmeoving it). That will make image lighter in the same instruction when You get it!.
+4. Use multistage builds
+5. Use RUN --mount=type=<type> oprion for RUN command of the dockerfile to map volumes when images are build (experimental feature). See more types in docker documentation.
 
 ## Linux definitions
 
