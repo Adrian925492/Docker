@@ -1,0 +1,10 @@
+version: '3'
+services:
+        php:
+                image: my-application
+                build: .
+                container_name: some_example_php_container
+                environment:
+                        - NAME 
+                ports:
+                        - 80:80

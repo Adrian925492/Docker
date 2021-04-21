@@ -1,2 +1,2 @@
 <?php
-	echo "Hello ".$_ENV['NAME']."\n"
+	echo "Hello ".$_ENV['NAME']."\n";
