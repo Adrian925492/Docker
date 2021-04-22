@@ -65,11 +65,19 @@ Docker compose YAML file sections:
 - volumes - optional, defines volumes to be used by the containers
 
 And each service in the YAML has to be defined by:
-- iamge indicates the image
-- build points to path with Dockerfile, and optionaly parameters for the build
-
-
-
+- iamge - required, indicates the image
+- build - required, points to path with Dockerfile, and optionaly parameters for the build
+- command - optional, alows to overwrite command defined in CMD in dockerfile
+- container-name - optional, overwrites default (given by docker-compose) name to the container. Dpcker-compose will automatically handle names conflict by adding numeric suffix to the given name.
+- depends_on - optional, allows to type dependencies between services (containers) to make chain of starting/stopping the services. Depends on waits for running the container, but not for services inside the containers waited on.
+- entrypoint - optional, allows to overwrite entrypoint to docker image
+- env_file - optional, path to file from which environmental variables has to be taken (can be single file or list of files)
+- environment - optional, allows environment variables addings (key - val is ENV - its value). All boolean has to be passed inside '', otherwise it will be treated as string. If we pass only a keys, the docker-compose will check if env is avaliable in host os, and if yes will use it (otherwise it will be empty).
+- network_mode: "host/none/bridge/services:[service name]/container:[container name]" - optional allows to overwrite network type of the container
+- restart: "no/always/on-failure/unless-stopped" - optional - value defining strategy what shall bedone when container stops, default is no
+- volumes - optional allows to ad volumes to the container, syntax is same as for docker run volumes (by mapping, no mapping or by volume name)
+- ports - optional, alows to pass list of ports that we want to map from host to container system (we can use ranges, like 8000-9000:8000-9000; or even ip adresses, like 192.164.1.1:8080:8080). We can add also protocul like *6060:6060/udp*
+- 
 
 Basic commands for docker compose and its analogy to docker client commands:
 - docker ps -> docker-compose ps
