@@ -88,6 +88,13 @@ Basic commands for docker compose and its analogy to docker client commands:
 - docker rm -> docker-compose rm
 - docker build -> docker-compose build
 
+Other commands:
+- docker-compose config - prints the content of docker compose config file
+
+! If we put an env inside docker compose, we can specify default value by **${ENV_VARIABLE:-default_value}**. The default value will be used if the env is not set in host system during startup of docker-compose. The file will be loaded only by docker compose (docker client not). The file name (.env) can be changed in config of docker-compose tool. We can also set it explicitly by **-env_file: [path to env file]** config to docker-compose yaml file.
+
+! If we want, we cen define text file named **.env** with environbmental variables (same foled as docker compose config). The env variables defined here will be loaded.
+
 **Daemon mode** - container can be run in attached and in daemon mode. In attached mode, the container *STDOUT* and *STDERR* streams are attached to terminal. In daemon mode, the streams are not attached and the contaienr works in background. We can see the streams by displaying container logs.
 
 > **_NOTE_** ! Popular programming languages has its eligeable images in docker hub naming same, as language. For example, to run python script we just need to type: 
