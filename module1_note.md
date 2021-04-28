@@ -27,6 +27,11 @@
 
 **Dangling images and dangling containers** - dangling images refers to images tahat are not taged and can be accesed only via its hash. Dangling image can occur if we rebuild some image and the old image would become a dangling. Same rule can be applied to containers, networks or volumes. To remove dangling objects we can use command ```docker <images / containers / volumes / networks > prune```. If we want to remove all dangling objects we can use command ```docker system prune```. In order to remove any specified non - dangling image, we can use ```docker rmi <image_name or hash>```, and to remove container - ```docker rm <container name of hash```. Adding ```-a``` flag to any prune command will efect removing all related to command docker objects, currently not running, not the dangling only. For example, if we have no container running at the moment, and we type ```docker system prune -a```, we will remove all contianers, images etc. The ```-f``` flag supress prune confirmation (usable in scripts).
 
+**Image registry** - is a HTTP server, that stores docker images and allows to push/pull it. 
+
+**Local image registry** - We are able to run local image register, by running docker registry project. It is contenerized application, as well as we can download and compile the sources. If we want to use contenerized app, we can pull and run it by command *docker run -d -v [docker_registry_loc_folder]:/var/lib/registry -p 5000:5000 registry:version, ex.2]
+*
+
 **Monitoring docker status** - we can observe and debug docker daemon by:
 > ```docker events``` command - shows logs about docker daemon - started/stopped containers, used networks etc.
 > Using debug mode - add env variable ``` ``` to ```/etc/docker/daemon.json``` and reload the config by sending **SIGHUP** signal to reload the daemon and apply the change. You can also kill the engine by **SIGKILL** and restore it again.
@@ -129,6 +134,8 @@ The docker will pull official image with python 3 alpine version and run "script
 * **docker exec <id or name> <command>** - Will execute command inside given docker image. The *-it* flag will make it in interactive mode. The *-u 0* parameter will do the command by root user (UID of the root user is 0).
 * **docker build <build context>** will build image basing on its dockerfile. The dockerfile has to exists inside build context (build context is a path). If we do not use any COPY or ADD command, we do not need any directory as build context, we can injest the Dockerfile to the docker build directly. In such situation the command would look like **docker build - < Dockerfile**. The **-** means we use nothing as build context, and the **<** means we inject directly the given dockerfile. If we have experimental features enabled, we can use *--squash* flag. The docker, after building all layrs will squash them to only one, big layer, and the final image will have just that single layer.
 * **docker network connect [container_name] [network_name]** - allows to connect the given docker container to the given network name in runtime. 
+* **docker save [image name or id] > [tar file path]** - Will save given image (or all versions of image, if the version is not given) to tar file. Optionally, it can be used with syntax *docker save -o [tar file path] [image name or id]*
+* **docker load -i [tar archive path]** - Loads exported image from tar archive.
 
 ## Docker environmental variables
 * **DOCKER_HOST** - specifies url of socket for docker engine. By changing it, we can reorder connection between docker client and docker engine.
@@ -246,3 +253,7 @@ b) Modify DOCKER_HOST variable (for one command or for whole session) to use pro
 
 **Process informations** - in /proc we have all informations about processes organized in catalogue structure. We can get from there for ex. informations about used resources, etc. The processes inside here are organized in folder structure, by ID, for example root process will be available under */proc/1* directory. We can also see how the user can see filesystem by */proc/1/root*. This will give us info about how the root user sees the fs. We can use it forex. to see files from container fs from host os just by going into: */proc/<PID of any process inside container>/root*. This will give us view of the fs inside container as root user of the container would see it. 
 
+**IP adress of th local machine** - we can get it via:
+```ip -br -c a``` <- The first interface (eth0) is external ip adress of the machin
+```hostname -I``` <- samek, the 1st listed ip is the external IP of the machine
+```curl ifconfig.co``` <- Will print extenral ip adress ot the machine
